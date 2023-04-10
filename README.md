@@ -1,4 +1,4 @@
-# Instance-Segment-Anything
+# Prompt-Segment-Anything
 This is an implementation of zero-shot instance segmentation using [Segment Anything](https://github.com/facebookresearch/segment-anything). Thanks to the authors of Segment Anything for their wonderful work! 
 
 This repository is based on [MMDetection](https://github.com/open-mmlab/mmdetection) and includes some code from [H-Deformable-DETR](https://github.com/HDETR/H-Deformable-DETR) and [FocalNet-DINO](https://github.com/FocalNet/FocalNet-DINO).
@@ -15,6 +15,7 @@ This repository is based on [MMDetection](https://github.com/open-mmlab/mmdetect
 |         Detector         |    SAM    | Detector's Box AP | Mask AP |                            Config                            |
 | :----------------------: | :-------: | :---------------: | :-----: | :----------------------------------------------------------: |
 | Swin-L+H-Deformable-DETR | sam-vit-b |       58.0        |  42.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-b.py) |
+| Swin-L+H-Deformable-DETR | sam-vit-l |       58.0        |  46.3   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-l.py) |
 |     FocalNet-L+DINO      | sam-vit-b |       63.2        |  44.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-b.py) |
 
 ## Installation
