@@ -1,0 +1,4 @@
+mmcv
+scipy
+torch
+torchvision
