@@ -5,20 +5,40 @@ This repository is based on [MMDetection](https://github.com/open-mmlab/mmdetect
 
 ![example1](assets/example1.jpg)
 
+## News
+
+**2023.04.11** [Swin-L+H-Deformable-DETR + SAM](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py)/[FocalNet-L+DINO + SAM](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) achieves strong COCO instance segmentation results: mask AP=46.8/49.1 by simply prompting SAM with boxes predicted by Swin-L+H-Deformable-DETR/FocalNet-L+DINO. (mask AP=46.5 based on ViTDet)🍺
+
 ## Catalog
 
 - [x] Support Swin-L+H-Deformable-DETR+SAM
 - [x] Support FocalNet-L+DINO+SAM
+- [ ] Support HuggingFace gradio demo
+- [ ] Support cascade prompts (box prompt + mask prompt)
 
-## Results
+## Box-as-Prompt Results
 
 |         Detector         |    SAM    | Detector's Box AP | Mask AP |                            Config                            |
-| :----------------------: | :-------: | :---------------: | :-----: | :----------------------------------------------------------: |
+| :---------------------- | :-------: | :---------------: | :-----: | :----------------------------------------------------------: |
+|  R50+H-Deformable-DETR   | sam-vit-b |       50.0        |  38.2   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-b.py) |
+|  R50+H-Deformable-DETR   | sam-vit-l |       50.0        |  41.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-l.py) |
+| Swin-T+H-Deformable-DETR | sam-vit-b |       53.2        |  40.0   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-t-hdetr_sam-vit-b.py) |
+| Swin-T+H-Deformable-DETR | sam-vit-l |       53.2        |  43.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-t-hdetr_sam-vit-l.py) |
 | Swin-L+H-Deformable-DETR | sam-vit-b |       58.0        |  42.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-b.py) |
 | Swin-L+H-Deformable-DETR | sam-vit-l |       58.0        |  46.3   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-l.py) |
+| Swin-L+H-Deformable-DETR | sam-vit-h |       58.0        |  46.8   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) |
 |     FocalNet-L+DINO      | sam-vit-b |       63.2        |  44.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-b.py) |
+|     FocalNet-L+DINO      | sam-vit-l |       63.2        |  48.6   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-l.py) |
+|     FocalNet-L+DINO      | sam-vit-h |       63.2        |  49.1   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) |
 
 ## Installation
+
+🍺🍺🍺 Add dockerhub enviroment 
+
+```
+docker pull kxqt/prompt-sam-torch1.12-cuda11.6:20230410
+nvidia-docker run -it --shm-size=4096m -v {your_path}:{path_in_docker} kxqt/prompt-sam-torch1.12-cuda11.6:20230410
+```
 
 We test the models under `python=3.7.10,pytorch=1.10.2,cuda=10.2`. Other versions might be available as well.
 
@@ -80,15 +100,19 @@ python -m wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.
 cd ..
 ```
 
-3. Swin-L+H-Deformable-DETR and FocalNet-L+DINO checkpoints
+3. R50/Swin-T/Swin-L+H-Deformable-DETR and FocalNet-L+DINO checkpoints
 
 ```bash
 cd ckpt
+python -m wget https://github.com/HDETR/H-Deformable-DETR/releases/download/v0.1/r50_hybrid_branch_lambda1_group6_t1500_dp0_mqs_lft_deformable_detr_plus_iterative_bbox_refinement_plus_plus_two_stage_36eps.pth -o r50_hdetr.pth
+python -m wget https://github.com/HDETR/H-Deformable-DETR/releases/download/v0.1/swin_tiny_hybrid_branch_lambda1_group6_t1500_dp0_mqs_lft_deformable_detr_plus_iterative_bbox_refinement_plus_plus_two_stage_36eps.pth -o swin_t_hdetr.pth
 python -m wget https://github.com/HDETR/H-Deformable-DETR/releases/download/v0.1/decay0.05_drop_path0.5_swin_large_hybrid_branch_lambda1_group6_t1500_n900_dp0_mqs_lft_deformable_detr_plus_iterative_bbox_refinement_plus_plus_two_stage_36eps.pth -o swin_l_hdetr.pth
 python -m wget https://projects4jw.blob.core.windows.net/focalnet/release/detection/focalnet_large_fl4_o365_finetuned_on_coco.pth -o focalnet_l_dino.pth
 cd ..
 
 # convert checkpoints
+python tools/convert_ckpt.py ckpt/r50_hdetr.pth ckpt/r50_hdetr.pth
+python tools/convert_ckpt.py ckpt/swin_t_hdetr.pth ckpt/swin_t_hdetr.pth
 python tools/convert_ckpt.py ckpt/swin_l_hdetr.pth ckpt/swin_l_hdetr.pth
 python tools/convert_ckpt.py ckpt/focalnet_l_dino.pth ckpt/focalnet_l_dino.pth
 ```

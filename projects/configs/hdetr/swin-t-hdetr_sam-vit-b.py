@@ -10,6 +10,7 @@ model = dict(
     det_wrapper_type='hdetr',
     det_wrapper_cfg=dict(aux_loss=True,
                          backbone='swin_tiny',
+                         num_classes=91,
                          cache_mode=False,
                          dec_layers=6,
                          dec_n_points=4,
