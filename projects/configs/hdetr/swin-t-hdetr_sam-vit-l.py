@@ -9,7 +9,7 @@ model = dict(
     type='DetWrapperInstanceSAM',
     det_wrapper_type='hdetr',
     det_wrapper_cfg=dict(aux_loss=True,
-                         backbone='resnet50',
+                         backbone='swin_tiny',
                          num_classes=91,
                          cache_mode=False,
                          dec_layers=6,
@@ -40,10 +40,10 @@ model = dict(
                          use_checkpoint=False,
                          use_fp16=False,
                          with_box_refine=True),
-    det_model_ckpt='ckpt/r50_hdetr.pth',
+    det_model_ckpt='ckpt/swin_t_hdetr.pth',
     num_classes=80,
-    model_type='vit_b',
-    sam_checkpoint='ckpt/sam_vit_b_01ec64.pth',
+    model_type='vit_l',
+    sam_checkpoint='ckpt/sam_vit_l_0b3195.pth',
     use_sam_iou=True,
 )
 img_norm_cfg = dict(

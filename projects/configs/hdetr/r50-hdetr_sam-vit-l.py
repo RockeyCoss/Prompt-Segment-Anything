@@ -42,8 +42,8 @@ model = dict(
                          with_box_refine=True),
     det_model_ckpt='ckpt/r50_hdetr.pth',
     num_classes=80,
-    model_type='vit_b',
-    sam_checkpoint='ckpt/sam_vit_b_01ec64.pth',
+    model_type='vit_l',
+    sam_checkpoint='ckpt/sam_vit_l_0b3195.pth',
     use_sam_iou=True,
 )
 img_norm_cfg = dict(
