@@ -22,7 +22,9 @@ from torch import nn
 import torch.nn.functional as F
 from torch.nn.init import xavier_uniform_, constant_
 
-from ..functions import MSDeformAttnFunction
+from mmcv.utils import IS_CUDA_AVAILABLE, IS_MLU_AVAILABLE
+
+from ..functions import MSDeformAttnFunction, ms_deform_attn_core_pytorch
 
 
 def _is_power_of_2(n):
@@ -154,13 +156,20 @@ class MSDeformAttn(nn.Module):
                     reference_points.shape[-1]
                 )
             )
-        output = MSDeformAttnFunction.apply(
-            value,
-            input_spatial_shapes,
-            input_level_start_index,
-            sampling_locations,
-            attention_weights,
-            self.im2col_step,
-        )
+        if ((IS_CUDA_AVAILABLE and value.is_cuda)
+                or (IS_MLU_AVAILABLE and value.is_mlu)):
+            output = MSDeformAttnFunction.apply(
+                value,
+                input_spatial_shapes,
+                input_level_start_index,
+                sampling_locations,
+                attention_weights,
+                self.im2col_step,
+            )
+        else:
+            output = ms_deform_attn_core_pytorch(value,
+                                                 input_spatial_shapes,
+                                                 sampling_locations,
+                                                 attention_weights)
         output = self.output_proj(output)
         return output
