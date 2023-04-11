@@ -7,13 +7,16 @@ This repository is based on [MMDetection](https://github.com/open-mmlab/mmdetect
 
 ## News
 
+**2023.04.11** Our [demo](https://huggingface.co/spaces/rockeycoss/Prompt-Segment-Anything-Demo) is available now. Please feel free to check it out.
+
 **2023.04.11** [Swin-L+H-Deformable-DETR + SAM](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py)/[FocalNet-L+DINO + SAM](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) achieves strong COCO instance segmentation results: mask AP=46.8/49.1 by simply prompting SAM with boxes predicted by Swin-L+H-Deformable-DETR/FocalNet-L+DINO. (mask AP=46.5 based on ViTDet)🍺
 
 ## Catalog
 
 - [x] Support Swin-L+H-Deformable-DETR+SAM
 - [x] Support FocalNet-L+DINO+SAM
-- [ ] Support HuggingFace gradio demo
+- [x] Support R50+H-Deformable-DETR+SAM/Swin-T+H-Deformable-DETR
+- [x] Support HuggingFace gradio demo
 - [ ] Support cascade prompts (box prompt + mask prompt)
 
 ## Box-as-Prompt Results
@@ -94,26 +97,37 @@ pip install wget
 ```bash
 mkdir ckpt
 cd ckpt
-python -m wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
-python -m wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth
 python -m wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth
+python -m wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth
+python -m wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
 cd ..
 ```
 
-3. R50/Swin-T/Swin-L+H-Deformable-DETR and FocalNet-L+DINO checkpoints
+3. Here are the checkpoints for the detection models. You can download only the checkpoints you need.
 
 ```bash
+# R50+H-Deformable-DETR
 cd ckpt
 python -m wget https://github.com/HDETR/H-Deformable-DETR/releases/download/v0.1/r50_hybrid_branch_lambda1_group6_t1500_dp0_mqs_lft_deformable_detr_plus_iterative_bbox_refinement_plus_plus_two_stage_36eps.pth -o r50_hdetr.pth
+cd ..
+python tools/convert_ckpt.py ckpt/r50_hdetr.pth ckpt/r50_hdetr.pth
+
+# Swin-T+H-Deformable-DETR
+cd ckpt
 python -m wget https://github.com/HDETR/H-Deformable-DETR/releases/download/v0.1/swin_tiny_hybrid_branch_lambda1_group6_t1500_dp0_mqs_lft_deformable_detr_plus_iterative_bbox_refinement_plus_plus_two_stage_36eps.pth -o swin_t_hdetr.pth
+cd ..
+python tools/convert_ckpt.py ckpt/swin_t_hdetr.pth ckpt/swin_t_hdetr.pth
+
+# Swin-L+H-Deformable-DETR
+cd ckpt
 python -m wget https://github.com/HDETR/H-Deformable-DETR/releases/download/v0.1/decay0.05_drop_path0.5_swin_large_hybrid_branch_lambda1_group6_t1500_n900_dp0_mqs_lft_deformable_detr_plus_iterative_bbox_refinement_plus_plus_two_stage_36eps.pth -o swin_l_hdetr.pth
+cd ..
+python tools/convert_ckpt.py ckpt/swin_l_hdetr.pth ckpt/swin_l_hdetr.pth
+
+# FocalNet-L+DINO
+cd ckpt
 python -m wget https://projects4jw.blob.core.windows.net/focalnet/release/detection/focalnet_large_fl4_o365_finetuned_on_coco.pth -o focalnet_l_dino.pth
 cd ..
-
-# convert checkpoints
-python tools/convert_ckpt.py ckpt/r50_hdetr.pth ckpt/r50_hdetr.pth
-python tools/convert_ckpt.py ckpt/swin_t_hdetr.pth ckpt/swin_t_hdetr.pth
-python tools/convert_ckpt.py ckpt/swin_l_hdetr.pth ckpt/swin_l_hdetr.pth
 python tools/convert_ckpt.py ckpt/focalnet_l_dino.pth ckpt/focalnet_l_dino.pth
 ```
 
