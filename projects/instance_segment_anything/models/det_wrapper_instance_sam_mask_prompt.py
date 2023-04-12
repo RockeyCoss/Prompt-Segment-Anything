@@ -10,6 +10,8 @@ from .det_wrapper_instance_sam import DetWrapperInstanceSAM
 class DetWrapperInstanceSAMMaskPrompt(DetWrapperInstanceSAM):
     def __init__(self,
                  stage_2_with_box_p=False,
+                 stage_1_multi_mask=False,
+
                  det_wrapper_type='hdetr',
                  det_wrapper_cfg=None,
                  det_model_ckpt=None,
@@ -32,6 +34,7 @@ class DetWrapperInstanceSAMMaskPrompt(DetWrapperInstanceSAM):
                                                               test_cfg=test_cfg)
         # whether stage 2 input box prompt
         self.stage_2_with_box_p = stage_2_with_box_p
+        self.stage_1_multi_mask = stage_1_multi_mask
 
     def simple_test(self, img, img_metas, rescale=True):
         """Test without augmentation.
@@ -56,16 +59,20 @@ class DetWrapperInstanceSAMMaskPrompt(DetWrapperInstanceSAM):
 
         transformed_boxes = self.predictor.transform.apply_boxes_torch(output_boxes, image.shape[:2])
 
-        # mask_pred: n,1,h,w
-        # sam_score: n, 1
-        # coarse_mask: n,1,256,256
-        _1, _2, coarse_mask = self.predictor.predict_torch(
+        # mask_pred: n,1/3,h,w
+        # sam_score: n, 1/3
+        # coarse_mask: n,1/3,256,256
+        _1, coarse_mask_score, coarse_mask = self.predictor.predict_torch(
             point_coords=None,
             point_labels=None,
             boxes=transformed_boxes,
-            multimask_output=False,
+            multimask_output=self.stage_1_multi_mask,
             return_logits=True,
         )
+        if self.stage_1_multi_mask:
+            max_iou_idx = torch.max(coarse_mask_score, dim=1)[1]
+            coarse_mask = (coarse_mask[torch.arange(coarse_mask.size(0)),
+                                       max_iou_idx]).unsqueeze(1)
         mask_pred, sam_score, _ = self.predictor.predict_torch(
             point_coords=None,
             point_labels=None,
