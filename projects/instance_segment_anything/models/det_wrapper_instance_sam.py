@@ -49,7 +49,7 @@ class DetWrapperInstanceSAM(BaseDetector):
         # Whether use SAM's predicted IoU to calibrate the confidence score.
         self.use_sam_iou = use_sam_iou
         # If True, set multimask_output=True and return the mask with highest predicted IoU.
-        # if False, set multimask_output=False
+        # if False, set multimask_output=False and return the unique output mask.
         self.best_in_multi_mask = best_in_multi_mask
 
     def init_weights(self):

@@ -6,7 +6,7 @@ plugin = True
 plugin_dir = 'projects/instance_segment_anything/'
 
 model = dict(
-    type='DetWrapperInstanceSAMMaskPrompt',
+    type='DetWrapperInstanceSAMCascade',
     det_wrapper_type='hdetr',
     det_wrapper_cfg=dict(aux_loss=True,
                          backbone='resnet50',
@@ -40,13 +40,13 @@ model = dict(
                          use_checkpoint=False,
                          use_fp16=False,
                          with_box_refine=True),
-    stage_2_with_box_p=True,
-    stage_1_multi_mask=True,
     det_model_ckpt='ckpt/r50_hdetr.pth',
     num_classes=80,
     model_type='vit_b',
     sam_checkpoint='ckpt/sam_vit_b_01ec64.pth',
     use_sam_iou=True,
+    best_in_multi_mask=False,
+    stage_1_multi_mask=False,
 )
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
