@@ -32,8 +32,11 @@ class DetWrapperInstanceSAMMaskPrompt(DetWrapperInstanceSAM):
                                                               init_cfg=init_cfg,
                                                               train_cfg=train_cfg,
                                                               test_cfg=test_cfg)
-        # whether stage 2 input box prompt
+        # whether stage 2 uses box prompt
         self.stage_2_with_box_p = stage_2_with_box_p
+        # If True, then the coarse mask output by stage 1 will be the
+        # one with the highest predicted IoU among the three masks.
+        # If False, then stage 1 will only output one coarse mask.
         self.stage_1_multi_mask = stage_1_multi_mask
 
     def simple_test(self, img, img_metas, rescale=True):
