@@ -7,7 +7,7 @@ This repository is based on [MMDetection](https://github.com/open-mmlab/mmdetect
 
 ## News
 
-**2023.04.11** Multimask output mode and cascade prompt mode is available now.
+**2023.04.12** Multimask output mode and cascade prompt mode is available now.
 
 **2023.04.11** Our [demo](https://huggingface.co/spaces/rockeycoss/Prompt-Segment-Anything-Demo) is available now. Please feel free to check it out.
 
