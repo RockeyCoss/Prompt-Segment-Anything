@@ -25,6 +25,7 @@ class DetWrapperInstanceSAM(BaseDetector):
                  model_type='vit_b',
                  sam_checkpoint=None,
                  use_sam_iou=True,
+                 best_in_multi_mask=False,
 
                  init_cfg=None,
                  train_cfg=None,
@@ -45,7 +46,11 @@ class DetWrapperInstanceSAM(BaseDetector):
         sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
         _ = sam.to(device=self.learnable_placeholder.weight.device)
         self.predictor = SamPredictor(sam)
+        # Whether use SAM's predicted IoU to calibrate the confidence score.
         self.use_sam_iou = use_sam_iou
+        # If True, set multimask_output=True and return the mask with highest predicted IoU.
+        # if False, set multimask_output=False and return the unique output mask.
+        self.best_in_multi_mask = best_in_multi_mask
 
     def init_weights(self):
         pass
@@ -73,18 +78,27 @@ class DetWrapperInstanceSAM(BaseDetector):
 
         transformed_boxes = self.predictor.transform.apply_boxes_torch(output_boxes, image.shape[:2])
 
-        # mask_pred: n,1,h,w
-        # sam_score: n, 1
+        # mask_pred: n,1/3,h,w
+        # sam_score: n, 1/3
         mask_pred, sam_score, _ = self.predictor.predict_torch(
             point_coords=None,
             point_labels=None,
             boxes=transformed_boxes,
-            multimask_output=False,
+            multimask_output=self.best_in_multi_mask,
             return_logits=True,
         )
-        # Tensor(n,h,w), raw mask pred
-        mask_pred = mask_pred.squeeze(1)
-        sam_score = sam_score.squeeze(-1)
+        if self.best_in_multi_mask:
+            # sam_score: n
+            sam_score, max_iou_idx = torch.max(sam_score, dim=1)
+            # mask_pred: n,h,w
+            mask_pred = mask_pred[torch.arange(mask_pred.size(0)),
+                                  max_iou_idx]
+        else:
+            # Tensor(n,h,w), raw mask pred
+            # n,1,h,w->n,h,w
+            mask_pred = mask_pred.squeeze(1)
+            # n,1->n
+            sam_score = sam_score.squeeze(-1)
 
         # Tensor(n,)
         label_pred = results[0]['labels']

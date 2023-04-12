@@ -7,6 +7,8 @@ This repository is based on [MMDetection](https://github.com/open-mmlab/mmdetect
 
 ## News
 
+**2023.04.11** Multimask output mode and cascade prompt mode is available now.
+
 **2023.04.11** Our [demo](https://huggingface.co/spaces/rockeycoss/Prompt-Segment-Anything-Demo) is available now. Please feel free to check it out.
 
 **2023.04.11** [Swin-L+H-Deformable-DETR + SAM](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py)/[FocalNet-L+DINO + SAM](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) achieves strong COCO instance segmentation results: mask AP=46.8/49.1 by simply prompting SAM with boxes predicted by Swin-L+H-Deformable-DETR/FocalNet-L+DINO. (mask AP=46.5 based on ViTDet)🍺
@@ -17,22 +19,36 @@ This repository is based on [MMDetection](https://github.com/open-mmlab/mmdetect
 - [x] Support FocalNet-L+DINO+SAM
 - [x] Support R50+H-Deformable-DETR+SAM/Swin-T+H-Deformable-DETR
 - [x] Support HuggingFace gradio demo
-- [ ] Support cascade prompts (box prompt + mask prompt)
+- [x] Support cascade prompts (box prompt + mask prompt)
 
 ## Box-as-Prompt Results
 
-|         Detector         |    SAM    | Detector's Box AP | Mask AP |                            Config                            |
-| :---------------------- | :-------: | :---------------: | :-----: | :----------------------------------------------------------: |
-|  R50+H-Deformable-DETR   | sam-vit-b |       50.0        |  38.2   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-b.py) |
-|  R50+H-Deformable-DETR   | sam-vit-l |       50.0        |  41.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-l.py) |
-| Swin-T+H-Deformable-DETR | sam-vit-b |       53.2        |  40.0   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-t-hdetr_sam-vit-b.py) |
-| Swin-T+H-Deformable-DETR | sam-vit-l |       53.2        |  43.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-t-hdetr_sam-vit-l.py) |
-| Swin-L+H-Deformable-DETR | sam-vit-b |       58.0        |  42.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-b.py) |
-| Swin-L+H-Deformable-DETR | sam-vit-l |       58.0        |  46.3   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-l.py) |
-| Swin-L+H-Deformable-DETR | sam-vit-h |       58.0        |  46.8   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) |
-|     FocalNet-L+DINO      | sam-vit-b |       63.2        |  44.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-b.py) |
-|     FocalNet-L+DINO      | sam-vit-l |       63.2        |  48.6   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-l.py) |
-|     FocalNet-L+DINO      | sam-vit-h |       63.2        |  49.1   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) |
+|         Detector         |    SAM    |    multimask ouput    | Detector's Box AP | Mask AP |                            Config                            |
+| :---------------------: | :-------: | :---------------: | :-----: | :----------------------------------------------------------: | ----------------------- |
+|  R50+H-Deformable-DETR   | sam-vit-b | :x: |       50.0        |  38.2   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-b.py) |
+| R50+H-Deformable-DETR | sam-vit-b | :heavy_check_mark: | 50.0 | 39.9 | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-b_best-in-multi.py) |
+|  R50+H-Deformable-DETR   | sam-vit-l | :x: |       50.0        |  41.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-l.py) |
+| Swin-T+H-Deformable-DETR | sam-vit-b | :x: |       53.2        |  40.0   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-t-hdetr_sam-vit-b.py) |
+| Swin-T+H-Deformable-DETR | sam-vit-l | :x: |       53.2        |  43.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-t-hdetr_sam-vit-l.py) |
+| Swin-L+H-Deformable-DETR | sam-vit-b | :x: |       58.0        |  42.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-b.py) |
+| Swin-L+H-Deformable-DETR | sam-vit-l | :x: |       58.0        |  46.3   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-l.py) |
+| Swin-L+H-Deformable-DETR | sam-vit-h | :x: |       58.0        |  46.8   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) |
+|     FocalNet-L+DINO      | sam-vit-b | :x: |       63.2        |  44.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-b.py) |
+|     FocalNet-L+DINO      | sam-vit-l | :x: |       63.2        |  48.6   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-l.py) |
+|     FocalNet-L+DINO      | sam-vit-h | :x: |       63.2        |  49.1   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h.py) |
+
+## Cascade-Prompt Results
+
+|       Detector        |    SAM    |  multimask ouput   | Detector's Box AP | Mask AP | Config                                                       |
+| :-------------------: | :-------: | :----------------: | :---------------: | :-----: | ------------------------------------------------------------ |
+| R50+H-Deformable-DETR | sam-vit-b |        :x:         |       50.0        |  38.8   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-b_cascade.py) |
+| R50+H-Deformable-DETR | sam-vit-b | :heavy_check_mark: |       50.0        |  40.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-b_best-in-multi_cascade.py) |
+
+***Note***
+
+**multimask ouput**: If multimask output is :heavy_check_mark:, SAM will predict three masks for each prompt, and the segmentation result will be the one with the highest predicted IoU. Otherwise, if multimask output is :x:, SAM will return only one mask for each prompt, which will be used as the segmentation result.
+
+**cascade-prompt**: In the cascade-prompt setting, the segmentation process involves two stages. In the first stage, a coarse mask is predicted with a bounding box prompt. The second stage then utilizes both the bounding box and the coarse mask as prompts to predict the final segmentation result. Note that if multimask output is :heavy_check_mark:, the first stage will predict three coarse masks, and the second stage will use the mask with the highest predicted IoU as the prompt.
 
 ## Installation
 

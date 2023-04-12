@@ -7,9 +7,10 @@ from .det_wrapper_instance_sam import DetWrapperInstanceSAM
 
 
 @DETECTORS.register_module()
-class DetWrapperInstanceSAMMaskPrompt(DetWrapperInstanceSAM):
+class DetWrapperInstanceSAMCascade(DetWrapperInstanceSAM):
     def __init__(self,
-                 stage_2_with_box_p=False,
+                 stage_1_multi_mask=False,
+
                  det_wrapper_type='hdetr',
                  det_wrapper_cfg=None,
                  det_model_ckpt=None,
@@ -17,21 +18,25 @@ class DetWrapperInstanceSAMMaskPrompt(DetWrapperInstanceSAM):
                  model_type='vit_b',
                  sam_checkpoint=None,
                  use_sam_iou=True,
+                 best_in_multi_mask=False,
                  init_cfg=None,
                  train_cfg=None,
                  test_cfg=None):
-        super(DetWrapperInstanceSAMMaskPrompt, self).__init__(det_wrapper_type=det_wrapper_type,
-                                                              det_wrapper_cfg=det_wrapper_cfg,
-                                                              det_model_ckpt=det_model_ckpt,
-                                                              num_classes=num_classes,
-                                                              model_type=model_type,
-                                                              sam_checkpoint=sam_checkpoint,
-                                                              use_sam_iou=use_sam_iou,
-                                                              init_cfg=init_cfg,
-                                                              train_cfg=train_cfg,
-                                                              test_cfg=test_cfg)
-        # whether stage 2 input box prompt
-        self.stage_2_with_box_p = stage_2_with_box_p
+        super(DetWrapperInstanceSAMCascade, self).__init__(det_wrapper_type=det_wrapper_type,
+                                                           det_wrapper_cfg=det_wrapper_cfg,
+                                                           det_model_ckpt=det_model_ckpt,
+                                                           num_classes=num_classes,
+                                                           model_type=model_type,
+                                                           sam_checkpoint=sam_checkpoint,
+                                                           use_sam_iou=use_sam_iou,
+                                                           best_in_multi_mask=best_in_multi_mask,
+                                                           init_cfg=init_cfg,
+                                                           train_cfg=train_cfg,
+                                                           test_cfg=test_cfg)
+        # If True, then the coarse mask output by stage 1 will be the
+        # one with the highest predicted IoU among the three masks.
+        # If False, then stage 1 will only output one coarse mask.
+        self.stage_1_multi_mask = stage_1_multi_mask
 
     def simple_test(self, img, img_metas, rescale=True):
         """Test without augmentation.
@@ -56,28 +61,40 @@ class DetWrapperInstanceSAMMaskPrompt(DetWrapperInstanceSAM):
 
         transformed_boxes = self.predictor.transform.apply_boxes_torch(output_boxes, image.shape[:2])
 
-        # mask_pred: n,1,h,w
-        # sam_score: n, 1
-        # coarse_mask: n,1,256,256
-        _1, _2, coarse_mask = self.predictor.predict_torch(
+        # mask_pred: n,1/3,h,w
+        # sam_score: n, 1/3
+        # coarse_mask: n,1/3,256,256
+        _1, coarse_mask_score, coarse_mask = self.predictor.predict_torch(
             point_coords=None,
             point_labels=None,
             boxes=transformed_boxes,
-            multimask_output=False,
+            multimask_output=self.stage_1_multi_mask,
             return_logits=True,
         )
+        if self.stage_1_multi_mask:
+            max_iou_idx = torch.max(coarse_mask_score, dim=1)[1]
+            coarse_mask = (coarse_mask[torch.arange(coarse_mask.size(0)),
+                                       max_iou_idx]).unsqueeze(1)
         mask_pred, sam_score, _ = self.predictor.predict_torch(
             point_coords=None,
             point_labels=None,
-            boxes=transformed_boxes if self.stage_2_with_box_p else None,
+            boxes=transformed_boxes,
             mask_input=coarse_mask,
-            multimask_output=False,
+            multimask_output=self.best_in_multi_mask,
             return_logits=True,
         )
-
-        # Tensor(n,h,w), raw mask pred
-        mask_pred = mask_pred.squeeze(1)
-        sam_score = sam_score.squeeze(-1)
+        if self.best_in_multi_mask:
+            # sam_score: n
+            sam_score, max_iou_idx = torch.max(sam_score, dim=1)
+            # mask_pred: n,h,w
+            mask_pred = mask_pred[torch.arange(mask_pred.size(0)),
+                                  max_iou_idx]
+        else:
+            # Tensor(n,h,w), raw mask pred
+            # n,1,h,w->n,h,w
+            mask_pred = mask_pred.squeeze(1)
+            # n,1->n
+            sam_score = sam_score.squeeze(-1)
 
         # Tensor(n,)
         label_pred = results[0]['labels']
