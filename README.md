@@ -163,6 +163,17 @@ bash tools/dist_test.sh path/to/the/config/file num_gpus --eval segm
 ```bash
 python tools/test.py path/to/the/config/file --show-dir path/to/the/visualization/results
 ```
+## Gradio Demo
+
+We also provide a UI for displaying the segmentation results that is built with gradio. To launch the demo, simply run the following command in a terminal:
+
+```bash
+pip install gradio
+python app.py
+```
+
+This demo is also hosted on HuggingFace [here](https://huggingface.co/spaces/rockeycoss/Prompt-Segment-Anything-Demo).
+
 ## More Segmentation Examples
 
 ![example2](assets/example2.jpg)
