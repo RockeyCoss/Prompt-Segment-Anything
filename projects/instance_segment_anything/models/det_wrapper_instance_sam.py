@@ -55,7 +55,7 @@ class DetWrapperInstanceSAM(BaseDetector):
     def init_weights(self):
         pass
 
-    def simple_test(self, img, img_metas, rescale=True):
+    def simple_test(self, img, img_metas, rescale=True, ori_img=None):
         """Test without augmentation.
         Args:
             imgs (Tensor): A batch of images.
@@ -71,12 +71,13 @@ class DetWrapperInstanceSAM(BaseDetector):
         # Tensor(n,4), xyxy, ori image scale
         output_boxes = results[0]['boxes']
 
-        image_path = img_metas[0]['filename']
-        image = cv2.imread(image_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        self.predictor.set_image(image)
+        if ori_img is None:
+            image_path = img_metas[0]['filename']
+            ori_img = cv2.imread(image_path)
+            ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
+        self.predictor.set_image(ori_img)
 
-        transformed_boxes = self.predictor.transform.apply_boxes_torch(output_boxes, image.shape[:2])
+        transformed_boxes = self.predictor.transform.apply_boxes_torch(output_boxes, ori_img.shape[:2])
 
         # mask_pred: n,1/3,h,w
         # sam_score: n, 1/3
