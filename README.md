@@ -81,7 +81,7 @@ pip install torch torchvision
 
 ```
 pip install -U openmim
-mim install "mmcv>=2.0.0"
+mim install "mmcv<2.0.0"
 ```
 
 4. Install MMDetection's requirements
@@ -96,6 +96,12 @@ pip install -r requirements.txt
 cd projects/instance_segment_anything/ops
 python setup.py build install
 cd ../../..
+```
+
+Please note that the ``mmdet`` package does not need to be installed. If your environment already has the ``mmdet`` package installed, you can run the following command before executing other scripts:
+
+```bash
+export PYTHONPATH=$(pwd)
 ```
 
 ## Prepare COCO Dataset
