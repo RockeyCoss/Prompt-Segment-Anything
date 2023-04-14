@@ -81,7 +81,7 @@ pip install torch torchvision
 
 ```
 pip install -U openmim
-mim install "mmcv<2.0.0"
+mim install "mmcv-full<2.0.0"
 ```
 
 4. Install MMDetection's requirements
