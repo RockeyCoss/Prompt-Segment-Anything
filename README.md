@@ -43,6 +43,8 @@ This repository is based on [MMDetection](https://github.com/open-mmlab/mmdetect
 | :-------------------: | :-------: | :----------------: | :---------------: | :-----: | ------------------------------------------------------------ |
 | R50+H-Deformable-DETR | sam-vit-b |        :x:         |       50.0        |  38.8   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-b_cascade.py) |
 | R50+H-Deformable-DETR | sam-vit-b | :heavy_check_mark: |       50.0        |  40.5   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/r50-hdetr_sam-vit-b_best-in-multi_cascade.py) |
+| Swin-L+H-Deformable-DETR | sam-vit-h | :heavy_check_mark: |       58.0        |  47.3   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h_best-in-multi_cascade.py) |
+|     FocalNet-L+DINO      | sam-vit-h | :heavy_check_mark: |       63.2        |  49.6   | [config](https://github.com/RockeyCoss/Instance-Segment-Anything/blob/master/projects/configs/hdetr/swin-l-hdetr_sam-vit-h_best-in-multi_cascade.py) |
 
 ***Note***
 
